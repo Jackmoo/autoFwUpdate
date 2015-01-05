@@ -108,20 +108,21 @@ else:
     
 #======================== func select & param input =====================
 if IS_UPDATE:
-    print("choose: \n(1)to update latest DAILY firmware \n(2)to update any latest firmware \n(3)specify the firmware name \n(4)specify fw with path under 192.168.76.211:/Firmware_Release/ES_daily_build/")
-    updateDailyType = raw_input('Please choose(default is 4)')
+    print("choose: \n(1)update latest DAILY firmware \n(2)update any latest firmware \n(3)specify the firmware name \n(4)specify fw with path under 192.168.76.211:/Firmware_Release/ES_daily_build/")
+    updateDailyType = raw_input('Please choose(default is 1)')
     if updateDailyType == "1":
         print 'DAILY chose'
     elif updateDailyType == "2":
-        print 'latest chose'
+        print 'any latest chose'
     elif updateDailyType == "3":
         updateFwName = raw_input('enter the specific firmware name: ')
-    else:
-        #updateDailyType = 1
-        updateDailyType = "4"
+    elif updateDailyType == "4":
         updateFwPath = raw_input('enter the specific firmware with path(e.g.: /2014/Dec/25/ES-4200-4.0.0-343-DAILY-1225-1.fw): ')
-    #print("Update may cause problem to your NAS, are you still sure you still want to update? (y/N)")
-
+    else:
+        updateDailyType = 1
+        #updateDailyType = "4"
+        #updateFwPath = raw_input('enter the specific firmware with path(e.g.: /2014/Dec/25/ES-4200-4.0.0-343-DAILY-1225-1.fw): ')
+   
 if IS_REINIT:
     #get nas name
     print("Please enter the new NAS name you want to set")
@@ -143,7 +144,7 @@ if not FINAL_CEHCK=='y':
     print "Abort...."
     sys.exit()
     
-#==== main =========================================================================    
+#============================ main script ======================================    
 if IS_UPDATE:
     #try connect to another host
     waitForHostAvailable(NAS_IP, NAS_account)
