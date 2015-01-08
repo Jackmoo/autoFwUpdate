@@ -119,7 +119,7 @@ if IS_UPDATE:
     elif updateDailyType == "4":
         updateFwPath = raw_input('enter the specific firmware with path(e.g.: /2014/Dec/25/ES-4200-4.0.0-343-DAILY-1225-1.fw): ')
     else:
-        updateDailyType = 1
+        updateDailyType = "1"
         #updateDailyType = "4"
         #updateFwPath = raw_input('enter the specific firmware with path(e.g.: /2014/Dec/25/ES-4200-4.0.0-343-DAILY-1225-1.fw): ')
    
@@ -168,7 +168,7 @@ if IS_UPDATE:
     if dfResult.find('/Firmware_Release/ES_daily_build/') == -1:
         # mount remote folder where daily build is
         sshProcess.sendline('mount '+mount_remote_folder+' /mnt/fwupdate/')
-        sshProcess.expect('# ')
+        sshProcess.expect('# ',timeout=60)    #increase timeout that sometimes mount remote folder cause some delay
         
     print sshProcess.before
     # send command to check firmware location
@@ -199,7 +199,7 @@ if IS_UPDATE:
     print 'updating fw....'
     print '/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath
     sshProcess.sendline('/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath)
-    updateResult = sshProcess.expect(['Firmware update successfully.','Firmware update failed'], timeout=240)
+    updateResult = sshProcess.expect(['Firmware update successfully.','Firmware update failed'], timeout=360)
     print sshProcess.before
     if updateResult==0:
         print '===update SUCCESS!===' 
@@ -209,6 +209,7 @@ if IS_UPDATE:
 
     #reboot the system
     sshProcess.expect('# ')
+    time.sleep(30)  #wait for another controller to complete fw update 
     sshProcess.sendline('cf reboot')
     print 'rebooting...'
     time.sleep(5) 
