@@ -167,7 +167,7 @@ if IS_UPDATE:
     dfResult = sshProcess.before
     if dfResult.find('/Firmware_Release/ES_daily_build/') == -1:
         # mount remote folder where daily build is
-        sshProcess.sendline('mount '+mount_remote_folder+' /mnt/fwupdate/')
+        sshProcess.sendline('mount -o tcp '+mount_remote_folder+' /mnt/fwupdate/')
         sshProcess.expect('# ',timeout=60)    #increase timeout that sometimes mount remote folder cause some delay
         
     print sshProcess.before
