@@ -23,9 +23,10 @@ sshNewKey = "Are you sure you want to continue connecting"
 updateDailyType = ""
 updateFwName = ""
 updateFwPath = ""
+updateBothController = True
 
 cmdSearchLatest = 'find . -name *.fw -type f -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1 | cut -f2- -d" "'
-cmdSearchLatestDAILY = 'find -E . -name *.fw -type f -regex ".+(DAILY).+"  -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1 | cut -f2- -d" "'
+cmdSearchLatestDAILY = 'find -E . -name *.fw -type f -regex ".+(4200).+(DAILY).+"  -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1 | cut -f2- -d" "'
 
 #===================================
 
@@ -107,6 +108,7 @@ else:
     IS_REINIT = False
     
 #======================== func select & param input =====================
+# fw update type
 if IS_UPDATE:
     print("choose: \n(1)update latest DAILY firmware \n(2)update any latest firmware \n(3)specify the firmware name \n(4)specify fw with path under 192.168.76.211:/Firmware_Release/ES_daily_build/")
     updateDailyType = raw_input('Please choose(default is 1)')
@@ -122,12 +124,20 @@ if IS_UPDATE:
         updateDailyType = "1"
         #updateDailyType = "4"
         #updateFwPath = raw_input('enter the specific firmware with path(e.g.: /2014/Dec/25/ES-4200-4.0.0-343-DAILY-1225-1.fw): ')
-   
+
+# reinit NAS name
 if IS_REINIT:
     #get nas name
     print("Please enter the new NAS name you want to set")
     NAS_name = raw_input('')
-    
+
+# update both controller (es4200, x80)    
+print("Update both controller? (y/N) (Default: yes)")
+updateBoth = raw_input('')
+print updateBoth
+if updateBoth is 'N':
+    updateBothController = False
+   
 print "login information"
 print "IP: "+NAS_IP
 print "account: "+NAS_account
@@ -135,6 +145,7 @@ print "password: "+NAS_password
 print "WORK to do:"
 print "update firmware: "+str(IS_UPDATE)
 print "update method: "+updateDailyType
+print "update both controller: "+updateBoth
 print "reinit: "+str(IS_REINIT)
 print "new NAS name: "+NAS_name
 
@@ -197,8 +208,12 @@ if IS_UPDATE:
 
     #update fw
     print 'updating fw....'
-    print '/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath
-    sshProcess.sendline('/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath)
+    if updateBothController:
+        print '/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath
+        sshProcess.sendline('/nas/util/fwupdate -nNp -s local '+absoluteUpdateFwPath)
+    else:
+        print '/nas/util/fwupdate -nN -s local '+absoluteUpdateFwPath
+        sshProcess.sendline('/nas/util/fwupdate -nN -s local '+absoluteUpdateFwPath)
     updateResult = sshProcess.expect(['Firmware update successfully.','Firmware update failed'], timeout=360)
     print sshProcess.before
     if updateResult==0:
