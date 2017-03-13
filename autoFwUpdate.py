@@ -11,6 +11,7 @@ import subprocess
 import readline
 import pexpect
 import time
+import getopt
 
 #======== config variable ==========
 NAS_IP = ""
@@ -50,7 +51,7 @@ def createSshSession (IP, account, passwd):
         print "I enter the console"
         pass
     return p
-    
+
 def isHostSshAvailable (IP, account):
     print 'connecting to '+IP+'....'
     try:
@@ -66,7 +67,7 @@ def isHostSshAvailable (IP, account):
     except pexpect.ExceptionPexpect:
         print 'something bad happened'
         return False
-        
+
 def waitForHostAvailable (IP, account):
     #try connect to another host
     while not isHostSshAvailable(IP, account):
@@ -77,12 +78,50 @@ def removeTargetSshKey (IP):
     print 'reinit ssh key....'
     sshKeyRemoveCmd = "ssh-keygen -R "+IP
     subprocess.call(sshKeyRemoveCmd, shell=True)
+
+
+#============= get args ======================
+
+def usage():
+    print 'Usage: autoFwUpdate -rx -n <name> <target_ip> <target_account> <target_password>'
+    print 'example: autoFwUpdate -v -n sp 192.168.76.83 admin admin'
+    print '    options:'
+    print '        -r: also re-init target NAS'
+    print '        -x: if target is x80u'
+    print '        -n: NAS name when re-init'
     
-#===================================
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'rxn')
+except:
+    print 'no or wrong argument input'
+    usage()
+    sys.exit()
+    
+# handle opts
+for o, a in opts:
+    if o == '-v':
+        verbose = True
+    else:
+        usage()
+        sys.exit()
+        
+# handle args
+if len(args) == 0:
+    pass
+elif len(args) == 3:
+    NAS_IP = args[0]
+    NAS_account = args[1]
+    NAS_password = args[]
+else:
+    usage()
+    sys.exit()
+
 
 #=========== main script ===========
 cmd = ""
 
+'''
 print("Enter the host ip/domain you want to update")
 NAS_IP = raw_input('')
 print NAS_IP
@@ -91,6 +130,7 @@ NAS_account = raw_input('account: ')
 print NAS_account
 NAS_password = raw_input('password: ')
 print NAS_password
+'''
 
 #since after reinit, the ssh may change, we have to remove it in system 
 removeTargetSshKey(NAS_IP)
